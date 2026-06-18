@@ -1,9 +1,62 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, field
-from typing import Optional, Literal
+from pydantic import BaseModel, Field
+from typing import Literal
+import servis
+
 from database.mission_db import dbmission
+
+class CreateMission(BaseModel):
+    title: str = Field(..., min_length=1, max_length=50)
+    description: str = Field(..., min_length=1)
+    location: str = Field(..., min_length=1, max_length=50)
+    difficulty: int = Field(..., ge=1, le=10)
+    importance: int = Field(..., ge=1, le=10)
+
+Status = Literal['New', 'Assigned', 'In Progress', 'Completed', 'Failed', 'Cancelled']
+class UpdateStatus(BaseModel):
+    status: Status
+
 
 router = APIRouter(prefix="/missions")
 
 
+@router.post("", status_code=201)
+def create_mission(mission: CreateMission):
+    data = mission.model_dump()
+    data["status"] = "New"
+    data["risk_level"] = servis.check_risk_level(data["difficulty"], data["importance"])
+    return dbmission.create_mission(data)
+
+
+@router.get("")
+def get_all_missions():
+    return dbmission.get_all_missions()
+
+
+
+
+@router.get("/{id}}")
+def missions_by_id(id):
+    pass
+
+@router.put("/{id}/assign/{agent_id")
+def assign():
+    pass
+
+@router.put("{id}/start")
+def status_update_start(id):
+    pass
+
+@router.put("{id}/complete")
+def status_update_complete(id):
+    pass
+
+
+@router.put("{id}/file")
+def status_update_file(id):
+    pass
+
+@router.put("{id}/cancel")
+def status_update_cancel(id):
+    pass
 
