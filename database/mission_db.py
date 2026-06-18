@@ -71,7 +71,8 @@ class MissionDB:
         conn = DB.get_connection()
         cursor = conn.cursor(dictionary=True)
         status_open = ('Assigned', 'In Progress')
-        cursor.execute("SELECT * FROM missions WHERE assigned_agent_id = %s AND status IN (%s, %s)", (id, *status_open))
+        sql = "SELECT * FROM missions WHERE assigned_agent_id = %s AND status IN (%s, %s)"
+        cursor.execute(sql, (id, status_open))
         data = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -99,8 +100,9 @@ class MissionDB:
     def count_open_missions(self):
         conn = DB.get_connection()
         cursor = conn.cursor()
-        status_open = 'New', 'Assigned', 'In Progress'
-        cursor.execute("SELECT COUNT(*) FROM missions WHERE status IN (%s, %s, %s)",(status_open))
+        status_open = ('New', 'Assigned', 'In Progress')
+        sql = "SELECT COUNT(*) FROM missions WHERE status IN (%s, %s, %s)"
+        cursor.execute(sql, status_open)
         data = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -109,7 +111,7 @@ class MissionDB:
     def count_critical_missions(self):
         conn = DB.get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM missions WHERE risk_level = %s", ('critical',))
+        cursor.execute("SELECT COUNT(*) FROM missions WHERE risk_level = %s", ('Critical',))
         data = cursor.fetchone()
         cursor.close()
         conn.close()

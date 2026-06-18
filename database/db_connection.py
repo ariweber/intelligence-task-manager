@@ -49,7 +49,7 @@ class DBconnection:
                        location VARCHAR(50) NOT NULL,
                        difficulty INT NOT NULL,
                        status ENUM('New', 'Assigned', 'In Progress', 'Completed', 'Failed', 'Cancelled') DEFAULT "New",
-                       risk_level ENUM('Low', 'Medium', 'High', critical)  NOT NULL,
+                       risk_level ENUM('Low', 'Medium', 'High', 'Critical')  NOT NULL,
                        assigned_agent_id INT)""")
         conn.commit()
         cursor.close()

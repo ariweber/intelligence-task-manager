@@ -35,28 +35,32 @@ def get_all_missions():
 
 
 
-@router.get("/{id}}")
+
+@router.get("/{id}")
 def missions_by_id(id):
-    pass
+    mission = dbmission.get_mission_by_id(id)
 
-@router.put("/{id}/assign/{agent_id")
-def assign():
-    pass
+@router.put("/{id}/assign/{agent_id}")
+def assign(id, agent_id):
+    return servis.assign(id, agent_id)
+    
 
-@router.put("{id}/start")
+
+
+@router.put("/{id}/start")
 def status_update_start(id):
-    pass
+    return servis.change_status(id, "Assigned", "In Progress")
 
-@router.put("{id}/complete")
+@router.put("/{id}/complete")
 def status_update_complete(id):
-    pass
+    return servis.change_status(id, "In Progress", "Completed")
 
 
-@router.put("{id}/file")
-def status_update_file(id):
-    pass
+@router.put("/{id}/fail")
+def status_update_fail(id):
+    return servis.change_status(id, "In Progress", "Failed")
 
-@router.put("{id}/cancel")
+@router.put("/{id}/cancel")
 def status_update_cancel(id):
-    pass
+    return servis.change_status(id, "Assigned", "Cancelled")
 
