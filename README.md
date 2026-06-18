@@ -1,5 +1,6 @@
 # intelligence-task-manager
 
+
 ## project description
 
 Tasks assigned to them. It uses MySQL as a database to store information about agents and tasks. And fastAPI kvrm to run the local server The project includes two main classes, AgentDB and MissionDB, ABU, BU, the ability to create, update agents and tasks. And managing agents and tasks in the database and the status of tasks by agents. The process of managing the status of tasks is managed according to the rules of the system.
@@ -17,9 +18,16 @@ intelligence-task-manager/
 │   ├── db_connection.py
 │   ├── agent_db.py
 │   └── mission_db.py
-├── README.md
-├── requirements.txt
-└── .gitignore
+|--routes/
+│ ├── agent_routes.py
+│ ├── mission_routes.py
+│ ├── mission_routes.py
+│ └── report_routes.py
+|--logs/
+│ └── app.log
+├── README.md 
+└── requirements.txt
+
 ```
 
 ## Tables structure
@@ -81,7 +89,32 @@ intelligence-task-manager/
  * count_critical_missions()
  * get_top_agent()
 
- ## System rules
+## endpoints
+### Agents endpoints
+[POST] /agents 
+[GET] /agents
+[GET] /agents/{id}
+[PUT] /agents{id}
+[PUT] /agents{id}/deactivate
+[GET] /agents/{id}/performance
+
+### Missions endpoints
+
+[POST] /missions
+[GET] /missions
+[PUT] /missions/{id}/assign/{agent_id}
+[PUT] /missions/{id}/start
+[PUT] /missions/{id}/complete 
+[PUT] /missions/{id}/fail 
+[PUT] /missions/{id}/cancel
+
+### Reports endpoints
+[GET] /summary/reports
+[GET] /reports/missions-by-status 
+[GET] /reports/top-agent
+
+
+## System rules
 
  1. rank must be Junior / Senior / Commander. any other value throws an error.
  2. Difficulty and importance must be between 1 and 10 — otherwise an error.
@@ -107,6 +140,7 @@ docker run -d --name intelligence-mysql -e MYSQL_ROOT_PASSWORD=1234 \
 5. Run the application (assuming you have a main.py to start the FastAPI server)
 uvicorn main:app --reload
 6. Access the API documentation at http://localhost:8000/docs
+
 
 
 

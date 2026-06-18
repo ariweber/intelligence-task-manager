@@ -10,18 +10,12 @@ class MissionDB:
                 data["location"],
                 data["difficulty"],
                 data["importance"],
-                data["status"]]
-       
-        if not check_is_exists(data["status"],self.STATUS):
-           raise ValueError(f"valid fild agent_rank in {self.STATUS}, {data["status"]} Does not fit the options" )
+                data["status"],
+                data["risk_level"]]
 
-        if not is_within_range(data["difficulty"]):
-            raise ValueError(f"{data["difficulty"]} is not in the right range.")
-        elif not is_within_range(data["importance"]):
-            raise ValueError(f"{data["difficulty"]} is not in the right range.") 
         conn = DB.get_connection()
         cursor = conn.cursor()
-        sql ="INSERT INTO missions (title, description, location,difficulty,importance,status) VALUES (%s, %s, %s, %s, %s)"
+        sql ="INSERT INTO missions (title, description, location,difficulty,importance,status,risk_level) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(sql,values)
         conn.commit()
         new_id  = cursor.lastrowid
@@ -51,14 +45,9 @@ class MissionDB:
 
 
     def assign_mission(self, m_id, a_id):
-        mission = self.get_mission_by_id(id)
-            
-        if mission is None:
-                return None
-            
         conn = DB.get_connection()
         cursor = conn.cursor()
-        cursor.execute("UPDATE missions SET assigned_agent_id = %s WHERE id = %s", (a_id))
+        cursor.execute("UPDATE missions SET assigned_agent_id = %s WHERE id = %s", (a_id, m_id))
         chake = cursor.rowcount() > 0
         cursor.close()
         conn.close()
@@ -66,34 +55,65 @@ class MissionDB:
             
 
     def update_mission_status(self, id, status):
-            mission = self.get_mission_by_id(id)
+        conn = DB.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE missions SET status = %s WHERE id = %s", (status,id))
+        conn.commit()
+        chake = cursor.rowcount > 0
+        cursor.close()
+        conn.close()
+        return chake
+    
             
-            if mission is None:
-                return None
-            
-            
-            conn = DB.get_connection()
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("UPDATE missions SET status = %s WHERE id = %s", (status,id))
-            chake = cursor.rowcount() > 0
-            cursor.close()
-            conn.close()
-            return chake
-
+           
     def get_open_missions_by_agent(self, id):
-        pass
+        conn = DB.get_connection()
+        cursor = conn.cursor()
+        status_open = 'Assigned', 'In Progress'
+        cursor.execute("SELECT * FROM missions WHERE id = %s, AND status IN (%s, %s)", (id,status_open))
+        data = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return data     
+        
 
     def count_all_missions(self):
-        pass
+        conn = DB.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM missions")
+        data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return data[0] 
 
     def count_by_status(self, status):
-        pass
+        conn = DB.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM missions WHERE status = %s",(status,))
+        data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return data[0]
 
     def count_open_missions(self):
-        pass
+        conn = DB.get_connection()
+        cursor = conn.cursor()
+        status_open = 'New', 'Assigned', 'In Progress'
+        cursor.execute("SELECT COUNT(*) FROM missions WHERE status IN (%s, %s, %s)",(status_open))
+        data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return data[0]
 
     def count_critical_missions(self):
-        pass
+        conn = DB.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM missions WHERE risk_level = critical")
+        data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return data[0]
 
     def get_top_agent(self):
         pass
+        

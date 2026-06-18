@@ -17,7 +17,7 @@ class DBconnection:
             raise    
 
     def get_connection(self):
-        if self.conn == None or self.conn.is_connected:
+        if self.conn is None or not self.conn.is_connected():
             self.connect()
         return self.conn
 
@@ -44,7 +44,8 @@ class DBconnection:
         cursor.execute("""CREATE TABLE IF NOT EXISTS missions (
                        id INT PRIMARY KEY AUTO_INCREMENT,
                        title VARCHAR(50) NOT NULL,
-                       description TEXT (50) NOT NULL,
+                       description TEXT NOT NULL,
+                       importance INT NOT NULL,
                        location VARCHAR(50) NOT NULL,
                        difficulty INT NOT NULL,
                        status ENUM('New', 'Assigned', 'In Progress', 'Completed', 'Failed', 'Cancelled') DEFAULT "New",
