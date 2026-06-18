@@ -1,4 +1,8 @@
+import logging
 import mysql.connector
+
+logger = logging.getLogger(__name__)
+
 
 class DBconnection:
     def __init__(self):
@@ -13,11 +17,14 @@ class DBconnection:
     def connect(self):
         try:
             self.conn = mysql.connector.connect(database=self._db_name, **self._config)
+            logger.info(f"Connected to database {self._db_name}")
         except mysql.connector.Error as e:
-            raise e
+            logger.error(f"Failed to connect to database: {e}")
+            raise 
 
     def get_connection(self):
         if self.conn is None or not self.conn.is_connected():
+            logger.info("No active connection, establishing a new one")
             self.connect()
         return self.conn
 
@@ -28,8 +35,10 @@ class DBconnection:
         conn.commit()
         cursor.close()
         conn.close()
+        logger.info(f"Database {self._db_name} is ready")
 
     def create_tables(self):
+        logger.info("Creating tables if they do not exist")
         conn = self.get_connection()
         cursor = conn.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS agents(
@@ -54,10 +63,13 @@ class DBconnection:
         conn.commit()
         cursor.close()
         conn.close()
-    
-    
+        logger.info("Tables are ready")
+
+
     def setup(self):
+        logger.info("Running database setup")
         self.create_database()
         self.create_tables()
+        logger.info("Database setup complete")
 
 DB = DBconnection()

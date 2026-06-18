@@ -1,9 +1,12 @@
+import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Literal
 import servis
 
 from database.mission_db import dbmission
+
+logger = logging.getLogger(__name__)
 
 class CreateMission(BaseModel):
     title: str = Field(..., min_length=1, max_length=50)
@@ -22,10 +25,13 @@ router = APIRouter(prefix="/missions")
 
 @router.post("", status_code=201)
 def create_mission(mission: CreateMission):
+    logger.info(f"Creating mission: {mission.title}")
     data = mission.model_dump()
     data["status"] = "New"
     data["risk_level"] = servis.check_risk_level(data["difficulty"], data["importance"])
-    return dbmission.create_mission(data)
+    created = dbmission.create_mission(data)
+    logger.info(f"Mission created")
+    return created
 
 
 @router.get("")
@@ -38,6 +44,7 @@ def get_all_missions():
 def missions_by_id(id: int):
     mission = dbmission.get_mission_by_id(id)
     if mission is None:
+        logger.warning(f"Mission {id} not found")
         raise HTTPException(status_code=404, detail="mission not found")
     return mission
 
