@@ -3,14 +3,13 @@ from database.agent_db import dbagant
 from fastapi import HTTPException
 def check_risk_level(difficulty:int,importance:int):
     result = (difficulty * 2) + importance
-    risk_level = ""
     if result <= 9:
         risk_level = "Low"
-    elif 9 < result < 18:
+    elif result <= 17:
         risk_level = "Medium"
-    elif 17 < result < 25:
+    elif result <= 25:
         risk_level = "High"
-    elif result > 25:
+    else:
         risk_level = "Critical"
     return risk_level
 
@@ -40,7 +39,7 @@ def change_status(id, current ,new_status):
         dbagant.increment_completed(mission["assigned_agent_id"])
     if new_status == "Failed":
         dbagant.increment_failed(mission["assigned_agent_id"])
-    return mission    
+    return dbmission.get_mission_by_id(id)
 
 
 def assign(id, agent_id):

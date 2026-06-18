@@ -72,7 +72,7 @@ class MissionDB:
         cursor = conn.cursor(dictionary=True)
         status_open = ('Assigned', 'In Progress')
         sql = "SELECT * FROM missions WHERE assigned_agent_id = %s AND status IN (%s, %s)"
-        cursor.execute(sql, (id, status_open))
+        cursor.execute(sql, (id, *status_open))
         data = cursor.fetchall()
         cursor.close()
         conn.close()

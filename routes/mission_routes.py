@@ -34,33 +34,34 @@ def get_all_missions():
 
 
 
-
-
 @router.get("/{id}")
-def missions_by_id(id):
+def missions_by_id(id: int):
     mission = dbmission.get_mission_by_id(id)
+    if mission is None:
+        raise HTTPException(status_code=404, detail="mission not found")
+    return mission
 
 @router.put("/{id}/assign/{agent_id}")
-def assign(id, agent_id):
+def assign(id: int, agent_id: int):
     return servis.assign(id, agent_id)
     
 
 
 
 @router.put("/{id}/start")
-def status_update_start(id):
+def status_update_start(id: int):
     return servis.change_status(id, "Assigned", "In Progress")
 
 @router.put("/{id}/complete")
-def status_update_complete(id):
+def status_update_complete(id: int):
     return servis.change_status(id, "In Progress", "Completed")
 
 
 @router.put("/{id}/fail")
-def status_update_fail(id):
+def status_update_fail(id: int):
     return servis.change_status(id, "In Progress", "Failed")
 
 @router.put("/{id}/cancel")
-def status_update_cancel(id):
+def status_update_cancel(id:int):
     return servis.change_status(id, "Assigned", "Cancelled")
 

@@ -25,6 +25,7 @@ def create_agent(agent: CreateAgent):
     data = dbagant.create_agent(agent.model_dump())
     if data["agent_rank"] not in RANK:
         raise HTTPException(status_code=400, detail=f"{data['agent_rank']} Illegal rank")
+    return data
 
 @router.get("")
 def get_all_agents():
