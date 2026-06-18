@@ -1,5 +1,4 @@
 from database.db_connection import DB
-from utils import check_is_exists
 
 class AgentDB:
     FIELDS = {"name", "specialty", "agent_rank"}
@@ -31,9 +30,9 @@ class AgentDB:
         if agent is None:
             return None
         
-        fields = {key: value for key, value in data.items() if key in self.FIELDS and value is not None} 
-        if not self.FIELDS:
-            return agent
+        fields = {key: value for key, value in data.items() if key in self.FIELDS and value is not None}
+        if not fields:
+            return False
 
         set_clause = ", ".join(f"{fielde} = %s" for fielde in fields)
         values = list(fields.values()) + [id]
@@ -85,13 +84,13 @@ class AgentDB:
 
     def increment_failed(self, id):
         agent =  self.get_agent_by_id(id)
-        
+
         if agent == None:
             return None
-        
+
         conn = DB.get_connection()
         cursor = conn.cursor()
-        cursor.execute("UPDATE agents SET completed_missions = completed_missions + 1 WHERE id = %s", (id,))
+        cursor.execute("UPDATE agents SET failed_missions = failed_missions + 1 WHERE id = %s", (id,))
         conn.commit()
         check = cursor.rowcount > 0
         cursor.close()

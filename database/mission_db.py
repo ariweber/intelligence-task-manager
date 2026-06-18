@@ -1,5 +1,5 @@
 from database.db_connection import DB
-from utils import check_is_exists, is_within_range
+
 
 class MissionDB:
     STATUS = ['New', 'Assigned', 'In Progress', 'Completed', 'Failed', 'Cancelled']
@@ -21,7 +21,7 @@ class MissionDB:
         new_id  = cursor.lastrowid
         cursor.close()
         conn.close()
-        return self.get_agent_by_id(new_id)
+        return self.get_mission_by_id(new_id)
 
 
     def get_all_missions(self):
@@ -48,10 +48,11 @@ class MissionDB:
         conn = DB.get_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE missions SET assigned_agent_id = %s WHERE id = %s", (a_id, m_id))
-        chake = cursor.rowcount() > 0
+        conn.commit()
+        chake = cursor.rowcount > 0
         cursor.close()
         conn.close()
-        return chake    
+        return chake
             
 
     def update_mission_status(self, id, status):
@@ -68,9 +69,9 @@ class MissionDB:
            
     def get_open_missions_by_agent(self, id):
         conn = DB.get_connection()
-        cursor = conn.cursor()
-        status_open = 'Assigned', 'In Progress'
-        cursor.execute("SELECT * FROM missions WHERE id = %s, AND status IN (%s, %s)", (id,status_open))
+        cursor = conn.cursor(dictionary=True)
+        status_open = ('Assigned', 'In Progress')
+        cursor.execute("SELECT * FROM missions WHERE assigned_agent_id = %s AND status IN (%s, %s)", (id, *status_open))
         data = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -108,12 +109,21 @@ class MissionDB:
     def count_critical_missions(self):
         conn = DB.get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM missions WHERE risk_level = critical")
+        cursor.execute("SELECT COUNT(*) FROM missions WHERE risk_level = %s", ('critical',))
         data = cursor.fetchone()
         cursor.close()
         conn.close()
         return data[0]
 
     def get_top_agent(self):
-        pass
+        conn = DB.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM agents ORDER BY completed_missions DESC LIMIT 1")
+        data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return data
+
+
+dbmission = MissionDB()
         

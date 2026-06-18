@@ -14,7 +14,7 @@ class DBconnection:
         try:
             self.conn = mysql.connector.connect(database=self._db_name, **self._config)
         except mysql.connector.Error as e:
-            raise    
+            raise e
 
     def get_connection(self):
         if self.conn is None or not self.conn.is_connected():
@@ -49,7 +49,7 @@ class DBconnection:
                        location VARCHAR(50) NOT NULL,
                        difficulty INT NOT NULL,
                        status ENUM('New', 'Assigned', 'In Progress', 'Completed', 'Failed', 'Cancelled') DEFAULT "New",
-                       risk_level ENUM('Low', 'Medium', 'High')  NOT NULL,
+                       risk_level ENUM('Low', 'Medium', 'High', critical)  NOT NULL,
                        assigned_agent_id INT)""")
         conn.commit()
         cursor.close()
